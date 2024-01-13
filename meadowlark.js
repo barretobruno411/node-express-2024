@@ -1,6 +1,7 @@
 const express = require('express')
 const expressHandlebars = require('express-handlebars')
 const fortune = require('./lib/fortune')
+const handlers = require('./lib/handlers')
 
 const app = express()
 
@@ -15,7 +16,7 @@ const port = process.env.port || 3000
 
 app.use(express.static(__dirname + '/public'))
 
-app.get('/', (req, res) => res.render('home'))
+app.get('/', handlers.home)
 
 const fortunes = [
     "Conquer your fears or they will conquer you.",
@@ -25,24 +26,13 @@ const fortunes = [
     "Whenever possible, keep it simple.",
   ]
 
-app.get('/about', (req, res) => {
-    res.render('about', {fortune: fortune.getFortune()})
-})
+app.get('/about', handlers.about)
 
 //pagina 404 personalizada
-app.use((req, res) => {
-    res.type('text/plain')
-    res.status(404)
-    res.render('404')
-})
+app.use((req, res) => handlers.notFound)
 
 // página 500 personalizada
-app.use((err, req, res, next) => {
-    console.error(err.message)
-    res.type('text/plain')
-    res.status(500)
-    res.render('500')
-})
+app.use((err, req, res, next) => handlers.serverError)
 
 app.listen(port, () => console.log(
     `Express started on http://localhost:${port};`
